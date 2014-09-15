@@ -5,16 +5,16 @@
  * Date: 2014-09-15
  * Time: 16:56
  */
-include_once("../View/View.php");
-include_once("../Model/Model.php");
+include_once("View/View.php");
+include_once("Model/UserModel.php");
 
 class LoginController{
     private $view;
-    private $model;
+    private $LoginModel;
 
     public function __construct(){
-        $this->model = new Model;
-        $this->view = new View($this->model);
+        $this->LoginModel = new UserModel();
+        $this->view = new View($this->LoginModel);
     }
 
     public function doControl(){
@@ -25,6 +25,8 @@ class LoginController{
             $this->model->doLogin();
             //Försök att logga in...
 
+        }else{
+            return $this->view->presentLoginForm();
         }
 
     }
