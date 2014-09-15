@@ -13,7 +13,7 @@ class LoginController{
     private $LoginModel;
 
     public function __construct(){
-        $this->LoginModel = new UserModel();
+        $this->UserModel = new UserModel();
         $this->view = new View($this->LoginModel);
     }
 
@@ -22,7 +22,7 @@ class LoginController{
         if($this->view->ifPersonUsedLogin()){
             //Om personen har tryckt på loginknappen
 
-            $this->model->doLogin();
+            $this->UserModel->doLogin();
             //Försök att logga in...
 
         }else{

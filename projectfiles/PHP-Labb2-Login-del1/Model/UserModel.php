@@ -14,4 +14,10 @@ Class UserModel {
 
     }
 
+    public function doLogin(){
+        //Användarnamnet+lösenordet är rätt, nu kan vi räknas som inloggade
+
+
+    }
+
 }
