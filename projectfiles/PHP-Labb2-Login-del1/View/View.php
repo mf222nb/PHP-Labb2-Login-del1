@@ -27,18 +27,28 @@ class view {
         $date = new Date();
         $date = $date->getDateTime(true);
 
-        //kollar om vi ska varna för tomt lösen/användarnamn
+        //kollar om vi ska varna för tomt lösen/användarnamn:
+        //För användarnamnet
         var_dump($_POST);
         if(@trim($_POST["name"]) == "" && @isset($_POST["name"])){
             $message = "<p>Användarnamn saknas</p>";
+            $currentUserName = "";
         }else{
             $message = "";
+
+            //hämtar ut användarnamnet...
+            $currentUserName = @$_POST["name"];
         }
+
+        //För lösenordet
         if(@trim($_POST["password"]) == "" && @isset($_POST["password"]) ){
             $message2 = "<p>Lösenord saknas</p>";
+
         }else{
             $message2 ="";
         }
+
+
 
         //Htmln som ska åka ut på klienten
         $ToClient ="
@@ -49,7 +59,7 @@ class view {
                         <fieldset>
                             <legend>Login - Skriv in användarnamn och lösenord</legend>
                             <label for='name'>Namn</label>
-                            <input type='text' id='name' name='name'>
+                            <input type='text' id='name' name='name' value=$currentUserName>
                             <label for='pass'>Lösenord</label>
                             <input type='text' id='pass' name='password'>
 

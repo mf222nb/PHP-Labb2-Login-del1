@@ -84,10 +84,10 @@
           <file leaf-file-name="View.php" pinned="false" current="true" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/View/View.php">
               <provider selected="true" editor-type-id="text-editor">
-                <state line="42" column="42" selection-start="951" selection-end="951" vertical-scroll-proportion="0.40369394" vertical-offset="408" max-vertical-offset="1275">
+                <state line="39" column="32" selection-start="860" selection-end="860" vertical-scroll-proportion="0.25100672" vertical-offset="476" max-vertical-offset="1445">
                   <folding>
-                    <marker date="1410804868422" expanded="true" signature="1122:1640" placeholder="..." />
-                    <marker date="1410804868422" expanded="true" signature="1157:1548" placeholder="..." />
+                    <marker date="1410805425216" expanded="true" signature="1307:1848" placeholder="..." />
+                    <marker date="1410805425216" expanded="true" signature="1342:1756" placeholder="..." />
                   </folding>
                 </state>
               </provider>
@@ -297,13 +297,33 @@
     </task>
     <servers />
   </component>
+  <component name="TodoView" selected-index="0">
+    <todo-panel id="selected-file">
+      <are-packages-shown value="false" />
+      <are-modules-shown value="false" />
+      <flatten-packages value="false" />
+      <is-autoscroll-to-source value="false" />
+    </todo-panel>
+    <todo-panel id="all">
+      <are-packages-shown value="false" />
+      <are-modules-shown value="false" />
+      <flatten-packages value="false" />
+      <is-autoscroll-to-source value="false" />
+    </todo-panel>
+    <todo-panel id="default-changelist">
+      <are-packages-shown value="false" />
+      <are-modules-shown value="false" />
+      <flatten-packages value="false" />
+      <is-autoscroll-to-source value="false" />
+    </todo-panel>
+  </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1616" height="916" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32962963" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32962963" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -389,10 +409,10 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/View/View.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="42" column="42" selection-start="951" selection-end="951" vertical-scroll-proportion="0.40369394" vertical-offset="408" max-vertical-offset="1275">
+        <state line="39" column="32" selection-start="860" selection-end="860" vertical-scroll-proportion="0.25100672" vertical-offset="476" max-vertical-offset="1445">
           <folding>
-            <marker date="1410804868422" expanded="true" signature="1122:1640" placeholder="..." />
-            <marker date="1410804868422" expanded="true" signature="1157:1548" placeholder="..." />
+            <marker date="1410805425216" expanded="true" signature="1307:1848" placeholder="..." />
+            <marker date="1410805425216" expanded="true" signature="1342:1756" placeholder="..." />
           </folding>
         </state>
       </provider>
