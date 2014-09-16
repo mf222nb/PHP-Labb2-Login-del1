@@ -20,9 +20,8 @@ Class UserModel {
 
         $_SESSION["ClientOnline"] = $clientID;
 
-
-
     }
+
     public function isUserOnline(){
         if(isset($_SESSION["ClientOnline"])){
             return true;

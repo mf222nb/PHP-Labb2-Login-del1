@@ -11,36 +11,32 @@ include_once("Model/UserModel.php");
 class LoginController{
     private $view;
     private $UserModel;
+    private $CookieJar;
 
     public function __construct(){
+        $this->CookieJar = new CookieJar();
         $this->UserModel = new UserModel();
         $this->view = new View($this->UserModel);
     }
 
     public function doControl(){
 
-        if($this->view->hasUserdemandLogout()){
-            //Om en användare har tryckt på logga ut så ska vi tömma
-            $this->UserModel->logoutUser();
-
-            $message = "Du har nu loggat ut!";
-
-            //vi laddar om sidan, och har förberett ett meddelande till clienten
-            header("Location: " . $_SERVER["PHP_SELF"]);
-        }
-
         if($this->view->ifPersonUsedLogin()){
-            //Om personen har tryckt på loginknappen och blivit godkänd
+            //Om personen har tryckt på loginknappen
 
-            $clientID = $this->view->getClientidentifier();
+            if($this->view->ifPersonTriedToLogin()){
+                //Om personen har  blivit godkänd
+                $clientID = $this->view->getClientidentifier();
 
-            //Gör användare inloggad
-            $this->UserModel->doLogin($clientID );
+                //Gör användare inloggad
+                $this->UserModel->doLogin($clientID);
 
-            //Vi skickar med ett meddelande som säger att inloggning lyckades
-            return $this->view->userIsOnlineView("Inloggning lyckades");
+                $ret = $this->view->userIsOnlineView();
+                //header("Location: " . $_SERVER["PHP_SELF"]);
+                return $ret;
+            }
 
-
+            return $this->view->presentLoginForm();
 
         }else{
             //vi kollar även om personen redan är inloggad..
@@ -49,14 +45,17 @@ class LoginController{
 
                 //här skickar vi med en tomsträng, vi behöver inte
                 //berätta att inloggning lyckades här...
-                return $this->view->userIsOnlineView("");
+                return $this->view->userIsOnlineView();
             }
+            $ret = $this->view->presentLoginForm();
+
+            return $ret;
 
 
-            return $this->view->presentLoginForm();
+
         }
 
     }
-
-
 }
+
+

@@ -7,11 +7,14 @@
  */
 require_once("Model/Date.php");
 require_once("Posted.php");
+include_once("CookieJar.php");
+
 class view {
     private $model;
+    private $CookieJar;
 
     public function __construct($model){
-
+        $this->CookieJar = new CookieJar();
         $this->model = $model;
 
     }
@@ -22,15 +25,40 @@ class view {
 
     }
 
-    public function userIsOnlineView($messageToClient){
-        $viewToReturn = "
-        $messageToClient
-        <p>Du är inloggad!</p>
-        <a href='?logout'>Logga ut</a>
+    public function userIsOnlineView(){
 
-        ";
+        if(isset($_GET["loggedin"])){
+            //om $_GET["loggedin"] finns så är det första gången sidan laddas
+            //Då ska vi presentera ett meddelande.. här skapas meddelandet..
+            $this->CookieJar->save("Inloggning lyckades");
 
-        return $viewToReturn;
+            //när meddelandet är satt ska sidan laddas om utan "loggedin"...
+            header("Location: " . $_SERVER["PHP_SELF"]);
+
+        }else{
+            if($this->hasUserdemandLogout()){
+                //Om en användare har tryckt på logga ut så ska vi tömma
+                $this->model->logoutUser();
+
+                $this->CookieJar->save("Du har nu loggat ut!");
+                //vi laddar om sidan, och har förberett ett meddelande till clienten
+                header("Location: " . $_SERVER["PHP_SELF"]);
+            }else{
+                $message = $this->CookieJar->load();
+                $viewToReturn = "
+                    $message
+                    <p>Du är inloggad!</p>
+                    <a href='?logout'>Logga ut</a>
+                    ";
+                //var_dump($message);
+                //die();
+                return $viewToReturn;
+            }
+
+        }
+
+
+
 
 
     }
@@ -45,12 +73,30 @@ class view {
     }
 
     public function ifPersonUsedLogin(){
+        if(isset($_POST["loginButton"])){
 
-        return $this->model->tryLogin(@$_POST["name"], @$_POST["password"]);
+            return true;
+        }
+        return false;
+    }
+
+    public function ifPersonTriedToLogin(){
+        //Vi testar om det angivna uppgifterna stämmer
+        if($this->model->tryLogin(@$_POST["name"], @$_POST["password"])){
+            //Vi lägger till GET så vi kan se när man precis loggat in...
+
+            header("Location: " . $_SERVER["PHP_SELF"] . "?loggedin");
+            return true;
+        }else{
+            return false;
+        }
+
+
 
     }
 
     public function presentLoginForm(){
+
         //hämtar ut datum
         $date = new Date();
         $date = $date->getDateTime(true);
@@ -86,13 +132,15 @@ class view {
             $message = "Felaktigt användarnamn och/eller lösenord";
         }
 
-
+        //Om det finns något att hämta i vår CookieMessage-kaka så ska den presenteras
+        $message3 = $this->CookieJar->load();
 
         //Htmln som ska åka ut på klienten
         $ToClient ="
                     <h3>Ej inloggad</h3>
                     $message
                     $message2
+                    $message3
                     <form action='' method='post'>
                         <fieldset>
                             <legend>Login - Skriv in användarnamn och lösenord</legend>
@@ -102,7 +150,7 @@ class view {
                             <input type='text' id='pass' name='password'>
 
                         </fieldset>
-                        <input type='submit' value='Logga in' >
+                        <input type='submit' value='Logga in' name='loginButton' >
                     </form>
 
                     <p>$date</p>
