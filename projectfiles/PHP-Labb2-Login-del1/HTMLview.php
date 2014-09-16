@@ -14,6 +14,7 @@ class HTMLview{
                 <html>
                 <head>
                 <meta charset=\"utf-8\" />
+                <title>Labb2</title>
                 </head>
                 <body>
                     $content

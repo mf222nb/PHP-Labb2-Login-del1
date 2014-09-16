@@ -110,9 +110,13 @@ class view {
         }else{
             $message = "";
 
-            //hämtar ut användarnamnet...
-            $currentUserName = @$_POST["name"];
+            if($_POST["name"] != ""){
+                //hämtar ut användarnamnet...
+                $currentUserName = "value=" . @$_POST["name"];
+            }
+
         }
+
 
         //För lösenordet
         if(@trim($_POST["password"]) == "" && @isset($_POST["password"]) ){
@@ -141,11 +145,11 @@ class view {
                     $message
                     $message2
                     $message3
-                    <form action='' method='post'>
+                    <form  method='post'>
                         <fieldset>
                             <legend>Login - Skriv in användarnamn och lösenord</legend>
                             <label for='name'>Namn</label>
-                            <input type='text' id='name' name='name' value=$currentUserName>
+                            <input type='text' id='name' name='name' $currentUserName>
                             <label for='pass'>Lösenord</label>
                             <input type='text' id='pass' name='password'>
 
