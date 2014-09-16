@@ -9,6 +9,8 @@ require_once("Model/Date.php");
 require_once("Controller/LoginController.php");
 require_once("HTMLview.php");
 
+session_start();
+
 //$date = new Date();
 $controller = new LoginController();
 

@@ -10,22 +10,49 @@ include_once("Model/UserModel.php");
 
 class LoginController{
     private $view;
-    private $LoginModel;
+    private $UserModel;
 
     public function __construct(){
         $this->UserModel = new UserModel();
-        $this->view = new View($this->LoginModel);
+        $this->view = new View($this->UserModel);
     }
 
     public function doControl(){
 
-        if($this->view->ifPersonUsedLogin()){
-            //Om personen har tryckt på loginknappen
+        if($this->view->hasUserdemandLogout()){
+            //Om en användare har tryckt på logga ut så ska vi tömma
+            $this->UserModel->logoutUser();
 
-            $this->UserModel->doLogin();
-            //Försök att logga in...
+            $message = "Du har nu loggat ut!";
+
+            //vi laddar om sidan, och har förberett ett meddelande till clienten
+            header("Location: " . $_SERVER["PHP_SELF"]);
+        }
+
+        if($this->view->ifPersonUsedLogin()){
+            //Om personen har tryckt på loginknappen och blivit godkänd
+
+            $clientID = $this->view->getClientidentifier();
+
+            //Gör användare inloggad
+            $this->UserModel->doLogin($clientID );
+
+            //Vi skickar med ett meddelande som säger att inloggning lyckades
+            return $this->view->userIsOnlineView("Inloggning lyckades");
+
+
 
         }else{
+            //vi kollar även om personen redan är inloggad..
+            if($this->UserModel->isUserOnline()){
+                //I det fallet ska vi presentera utloggningssidan
+
+                //här skickar vi med en tomsträng, vi behöver inte
+                //berätta att inloggning lyckades här...
+                return $this->view->userIsOnlineView("");
+            }
+
+
             return $this->view->presentLoginForm();
         }
 

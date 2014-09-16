@@ -15,55 +15,38 @@ class view {
         $this->model = $model;
 
     }
+    public function getClientidentifier(){
+        //returnerar det aktiva användarnamnet...
+
+        return $_POST["name"];
+
+    }
+
+    public function userIsOnlineView($messageToClient){
+        $viewToReturn = "
+        $messageToClient
+        <p>Du är inloggad!</p>
+        <a href='?logout'>Logga ut</a>
+
+        ";
+
+        return $viewToReturn;
+
+
+    }
+
+    public function hasUserdemandLogout(){
+        if(isset($_GET["logout"])){
+           return true;
+        }
+        else{
+            return false;
+        }
+    }
 
     public function ifPersonUsedLogin(){
-        //användaren har tryckt på login knappen.
 
-        //Först ska vi kolla om det finns en anvnädare med det angivna användarnamnet
-        //1. hämta ner arrayen med användarnamn
-        $users = file('View/users.txt');
-        var_dump($users);
-
-        for($i = 0; $i < count($users); $i++){
-
-            if($users[$i] === @$_POST["name"]){
-                //Om det finns så ska vi kolla om lösenordet matchar användarens användarnamn
-                $userNameToMatchPassword = $users[$i];
-                //Hämtar ner (det krypterade) lösenorden
-                $passList = file("View/usersPass.txt");
-                $myRegEx = '/^'.$userNameToMatchPassword.':.*/'; //regulärt uttryck för att hitta användarens lösenord
-
-                for($j = 0; $j < count($passList); $j++ ){
-                    $passList[$j];
-                    //var_dump($myRegEx, $passList[$j]);
-                    //var_dump(preg_match($myRegEx,$passList[$j]) == 1);
-                    if(preg_match($myRegEx,$passList[$j])== 1){
-                        //Om reg. matchar användarnamnet så har vi hittat lösenordet
-
-                        //Tar bort den delen som identiferar vems lösenord det är (så bara lösenordet är kvar..)
-                        $onlyPass = str_replace($userNameToMatchPassword.":", "" , $passList[$j]);
-
-                        //Kollar om lösenordet matchar det inmatade lösenordet OBS här ska krypterings göras..
-                        //TODO: Kryptera denna data...
-                        if($onlyPass === $_POST["password"]){
-                            return true;
-
-                        }
-
-                    }
-
-                }
-
-
-
-
-            }
-        }
-
-
-
-
-        return false;
+        return $this->model->tryLogin(@$_POST["name"], @$_POST["password"]);
 
     }
 
@@ -74,7 +57,7 @@ class view {
 
         //kollar om vi ska varna för tomt lösen/användarnamn:
         //För användarnamnet
-        var_dump($_POST);
+        //var_dump($_POST);
         if(@trim($_POST["name"]) == "" && @isset($_POST["name"])){
             $message = "<p>Användarnamn saknas</p>";
             $currentUserName = "";
