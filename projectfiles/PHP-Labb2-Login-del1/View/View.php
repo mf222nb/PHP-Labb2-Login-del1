@@ -35,13 +35,16 @@ class view {
     public function loginTroughCookies(){
         $shouldBeTrue = $this->model->tryLogin($this->CookieJar->getUserOrPasswordFromCookie(true), $this->CookieJar->getUserOrPasswordFromCookie(false), true);
 
-        if($shouldBeTrue){
+        //kollar så att kakan är giltig...
+        $cookieIsLegal = $this->CookieJar->isCookieLegal();
+
+        if($shouldBeTrue && $cookieIsLegal){
             header("Location: " . $_SERVER["PHP_SELF"] . "?loggedin" . "&logintroughcookies");
             return true;
         }else{
             $this->CookieJar->clearUserForRememberMe();
             $this->CookieJar->save("Felaktig information i cookie");
-            
+
             return false;
         }
 
@@ -120,7 +123,7 @@ class view {
 
     public function doesCookiesExist(){
 
-        if(isset($_COOKIE["CookieUserName"]) && $_COOKIE["CookieUserPass"]){
+        if(@isset($_COOKIE["CookieUserName"]) && @$_COOKIE["CookieUserPass"]){
             return true;
         }
         return false;

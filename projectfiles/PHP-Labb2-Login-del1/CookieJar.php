@@ -10,6 +10,7 @@ class CookieJar {
     private static $cookieMessage = "CookieMessage";
     private static $cookieUserName = "CookieUserName";
     private static $cookieUserPass = "CookieUserPass";
+    private $timeStampForCookies;
     private $rememberMeIsUsed;
 
 
@@ -44,14 +45,25 @@ class CookieJar {
         return $returnThis;
     }
 
+    public function isCookieLegal(){
+        //kollar så att ingen har manipulerat kakans tidsstämpel...
+
+        if(time() > $this->timeStampForCookies){
+            return false;
+        }else{
+            return true;
+        }
+
+    }
+
     public function saveUserForRememberMe($userName, $userPass){
 
-        setcookie(self::$cookieUserName, $userName, -1);
-        setcookie(self::$cookieUserPass, $userPass, -1);
-        //var_dump($this->rememberMeIsUsed == 1 . "heheh");
-        //$this->rememberMeIsUsed = TRUE;
+        $this->timeStampForCookies = time() + 25;
 
-        //var_dump($this->rememberMeIsUsed == 1 . "heheh");
+        setcookie(self::$cookieUserName, $userName, $this->timeStampForCookies);
+        setcookie(self::$cookieUserPass, $userPass, $this->timeStampForCookies);
+
+
     }
 
     public function getUserOrPasswordFromCookie($trueForUser){
