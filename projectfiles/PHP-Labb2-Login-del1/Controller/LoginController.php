@@ -21,6 +21,21 @@ class LoginController{
 
     public function doControl(){
 
+        if($this->view->doesCookiesExist() && $this->UserModel->isUserOnline() == false){
+            //anropar vyn för att ta reda på om kakor är satta och ingen redan är inloggad... för inloggning
+
+            if($this->view->loginTroughCookies()){
+                //Om personen har  blivit godkänd
+
+                $clientID = $this->view->getClientidentifier(true);
+
+                //Gör användare inloggad
+                $this->UserModel->doLogin($clientID);
+
+                return $this->view->userIsOnlineView();
+            }
+        }
+
         if($this->view->ifPersonUsedLogin()){
             //Om personen har tryckt på loginknappen
 

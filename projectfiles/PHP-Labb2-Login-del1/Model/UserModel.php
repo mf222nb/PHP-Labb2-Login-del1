@@ -73,8 +73,17 @@ Class UserModel {
 
 
     }
+    public function tryLoginTroughCookies($username, $password){
+        $users = file('View/users.txt');
+        for($i=0;$i< count($users);$i++){
+            //kollar om det anginva användarnamnet finns i
+            if($$users[$i] == $username){
 
-    public function tryLogin($username, $password){
+            }
+        }
+    }
+
+    public function tryLogin($username, $password, $loginTroughCookies = false){
         //användaren har tryckt på login knappen.
 
         //Först ska vi kolla om det finns en anvnädare med det angivna användarnamnet
@@ -93,10 +102,8 @@ Class UserModel {
                 $passList = file("View/usersPass.txt");
                 $myRegEx = '/^'.$userNameToMatchPassword.':.*/'; //regulärt uttryck för att hitta användarens lösenord
 
-
-
                 for($j = 0; $j < count($passList); $j++ ){
-                    $passList[$j];
+                    $passList[$j]; //användarnamnet + hashat lösenordet...
                     //var_dump($myRegEx, $passList[$j]);
                     //var_dump(preg_match($myRegEx,$passList[$j]) == 1);
                     //var_dump($passList[$j]);
@@ -114,13 +121,28 @@ Class UserModel {
                         //var_dump($onlyPass);//$this->cryptPass($onlyPass)
                         //var_dump($this->checkIfPasswordIstrue($password,$onlyPass));
                         //die();
+                        if($loginTroughCookies){
 
+                            if($password == $onlyPass){
+                                return true;
+                            }else{
+                                //om detta ej stämmer så är det något fel på kakan
+                                //den är troligtvis manipulerad, vi ska ta bort allt då...
+                                return false;
+                            }
 
-                        if($this->checkIfPasswordIstrue($password,$onlyPass)){//$password
-                            return $onlyPass;   //vi returnerar det hashade lösenordet om
-                                                //det stämde, då kan vi lägga den i en kaka...
+                        }else{
+                            // om $loginTroughCookies inte används, så är det en vanlig inloggning
 
+                            if($this->checkIfPasswordIstrue($password,$onlyPass)){//$password
+                                return $onlyPass;   //vi returnerar det hashade lösenordet om
+                                //det stämde, då kan vi lägga den i en kaka...
+
+                            }
                         }
+
+
+
                     }
                 }
             }

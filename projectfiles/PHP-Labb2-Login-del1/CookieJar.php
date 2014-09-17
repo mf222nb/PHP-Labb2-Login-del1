@@ -20,9 +20,11 @@ class CookieJar {
     public function save($stringToSave){
 
         setcookie(self::$cookieMessage, $stringToSave, -1);
+        $_COOKIE["CookieMessage"] = $stringToSave; //säkerhetsåtgärd... (tips från skolan..)
         //Sparar kakan i cookiearrayens nyckel "CookieMessage"
         //Värdet är värdet av $stringToSave
-        //-1 = kakan försvinner när sessionen är klar. webbläsaren stängts
+        //-1 = kakan försvinner när sessionen är klar.
+
     }
 
     public function load(){
@@ -50,6 +52,21 @@ class CookieJar {
         //$this->rememberMeIsUsed = TRUE;
 
         //var_dump($this->rememberMeIsUsed == 1 . "heheh");
+    }
+
+    public function getUserOrPasswordFromCookie($trueForUser){
+
+        if($trueForUser){
+            return $_COOKIE["CookieUserName"];
+        }else{
+            return $_COOKIE["CookieUserPass"];
+        }
+
+    }
+
+    public function clearUserForRememberMe(){
+        setcookie(self::$cookieUserName, null, -1);
+        setcookie(self::$cookieUserPass, null, -1);
     }
 
     public function setRememberMeToTrue(){

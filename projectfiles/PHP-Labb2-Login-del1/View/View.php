@@ -18,10 +18,32 @@ class view {
         $this->model = $model;
     }
 
-    public function getClientidentifier(){
+    public function getClientidentifier($loginTroughCookies = false){
         //returnerar det aktiva användarnamnet...
+        if($loginTroughCookies){
+            //om $loginTroughCookies är true så ska användarnamnet i kakan returneras...
+            return $this->CookieJar->getUserOrPasswordFromCookie(true);
 
-        return $_POST["name"];
+        }else{
+            //om kakor inte används, så har användaren loggat in och då hämtas namnet
+            //via Post...
+            return $_POST["name"];
+        }
+
+    }
+
+    public function loginTroughCookies(){
+        $shouldBeTrue = $this->model->tryLogin($this->CookieJar->getUserOrPasswordFromCookie(true), $this->CookieJar->getUserOrPasswordFromCookie(false), true);
+
+        if($shouldBeTrue){
+            header("Location: " . $_SERVER["PHP_SELF"] . "?loggedin" . "&logintroughcookies");
+            return true;
+        }else{
+            $this->CookieJar->clearUserForRememberMe();
+            $this->CookieJar->save("Felaktig information i cookie");
+            
+            return false;
+        }
 
     }
 
@@ -41,6 +63,9 @@ class view {
                 $welcomeString .= " och vi kommer ihåg dig nästa gång";
 
             }
+            if(isset($_GET["logintroughcookies"])){
+                $welcomeString .= " via cookies";
+            }
 
             $this->CookieJar->save($welcomeString);
 
@@ -51,6 +76,11 @@ class view {
             if($this->hasUserdemandLogout()){
                 //Om en användare har tryckt på logga ut så ska vi tömma
                 $this->model->logoutUser();
+
+                //Vi vill också tömma eventuella kakor...
+                if($this->doesCookiesExist()){
+                    $this->CookieJar->clearUserForRememberMe();
+                }
 
                 $this->CookieJar->save("Du har nu loggat ut!");
                 //vi laddar om sidan, och har förberett ett meddelande till clienten
@@ -88,6 +118,15 @@ class view {
         return false;
     }
 
+    public function doesCookiesExist(){
+
+        if(isset($_COOKIE["CookieUserName"]) && $_COOKIE["CookieUserPass"]){
+            return true;
+        }
+        return false;
+
+    }
+
     public function ifPersonTriedToLogin(){
         //Vi testar om det angivna uppgifterna stämmer
         $hashedPassIfSucsess = $this->model->tryLogin(@$_POST["name"], @$_POST["password"]);
@@ -108,14 +147,10 @@ class view {
             //Vi lägger till GET så vi kan se när man precis loggat in...
             header("Location: " . $_SERVER["PHP_SELF"] . "?loggedin" . $forRememberMe);
 
-
             return true;
         }else{
             return false;
         }
-
-
-
     }
 
     public function presentLoginForm(){
