@@ -8,6 +8,14 @@
 class CookieJar {
     //Class "tagen" från lektionsexempel : https://github.com/dntoll/1dv408-HT14/blob/master/Like/src/CookieStorage.php
     private static $cookieMessage = "CookieMessage";
+    private static $cookieUserName = "CookieUserName";
+    private static $cookieUserPass = "CookieUserPass";
+    private $rememberMeIsUsed;
+
+
+    public function __construct(){
+        $this->rememberMeIsUsed = false;
+    }
 
     public function save($stringToSave){
 
@@ -32,6 +40,25 @@ class CookieJar {
         //Genom att ange "time() -1" så säger vi att detta hände för en sekund sen
 
         return $returnThis;
+    }
+
+    public function saveUserForRememberMe($userName, $userPass){
+
+        setcookie(self::$cookieUserName, $userName, -1);
+        setcookie(self::$cookieUserPass, $userPass, -1);
+        //var_dump($this->rememberMeIsUsed == 1 . "heheh");
+        //$this->rememberMeIsUsed = TRUE;
+
+        //var_dump($this->rememberMeIsUsed == 1 . "heheh");
+    }
+
+    public function setRememberMeToTrue(){
+        $this->rememberMeIsUsed = true;
+        return $this;
+    }
+
+    public function isRememberMeUsed(){
+        return $this->rememberMeIsUsed;
     }
 
 }

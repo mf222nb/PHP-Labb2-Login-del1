@@ -11,13 +11,13 @@ include_once("CookieJar.php");
 
 class view {
     private $model;
-    private $CookieJar;
+    public $CookieJar;
 
     public function __construct($model){
         $this->CookieJar = new CookieJar();
         $this->model = $model;
-
     }
+
     public function getClientidentifier(){
         //returnerar det aktiva användarnamnet...
 
@@ -30,7 +30,19 @@ class view {
         if(isset($_GET["loggedin"])){
             //om $_GET["loggedin"] finns så är det första gången sidan laddas
             //Då ska vi presentera ett meddelande.. här skapas meddelandet..
-            $this->CookieJar->save("Inloggning lyckades");
+
+            $welcomeString = "Inloggning lyckades";
+
+            //var_dump($this);
+            //die();
+
+            if(isset($_GET["rememberme"])){
+               //Om rememberMe finns, så ska vi lägga till en ytterligare sak i välkommstexten...
+                $welcomeString .= " och vi kommer ihåg dig nästa gång";
+
+            }
+
+            $this->CookieJar->save($welcomeString);
 
             //när meddelandet är satt ska sidan laddas om utan "loggedin"...
             header("Location: " . $_SERVER["PHP_SELF"]);
@@ -57,10 +69,6 @@ class view {
 
         }
 
-
-
-
-
     }
 
     public function hasUserdemandLogout(){
@@ -82,10 +90,25 @@ class view {
 
     public function ifPersonTriedToLogin(){
         //Vi testar om det angivna uppgifterna stämmer
-        if($this->model->tryLogin(@$_POST["name"], @$_POST["password"])){
-            //Vi lägger till GET så vi kan se när man precis loggat in...
+        $hashedPassIfSucsess = $this->model->tryLogin(@$_POST["name"], @$_POST["password"]);
+        if($hashedPassIfSucsess != false){
+            // $hashedPassIfSucsess innehåller antingen det hashade lösenordet (om lyckad inloggning)
+            // eller false, om lösenordet ej stämde...
 
-            header("Location: " . $_SERVER["PHP_SELF"] . "?loggedin");
+            $forRememberMe = "";
+            //Här kollar vi också om "rememberMe" är ikryssad.
+            if(@isset($_POST["rememberMe"]) && $_POST["rememberMe"] == "on"){
+                //Om den är det så ska vi spara undan lösen+användarnamn i kakor
+                //som ska återanvändas nästa gång sidan besöks...
+                $this->CookieJar->saveUserForRememberMe($_POST["name"],$hashedPassIfSucsess);
+                $forRememberMe = "&rememberme";
+                //$this->CookieJar = $this->CookieJar->setRememberMeToTrue();
+            }
+
+            //Vi lägger till GET så vi kan se när man precis loggat in...
+            header("Location: " . $_SERVER["PHP_SELF"] . "?loggedin" . $forRememberMe);
+
+
             return true;
         }else{
             return false;
@@ -110,9 +133,13 @@ class view {
         }else{
             $message = "";
 
-            if($_POST["name"] != ""){
+            if(@$_POST["name"] != ""){
                 //hämtar ut användarnamnet...
                 $currentUserName = "value=" . @$_POST["name"];
+            }else{
+                //Om användarnamnet inte är "" och inte heller när den är trimmad fast ändå satt
+                //Då sätter vi currentUserName till tomsträng ""...
+                $currentUserName = "";
             }
 
         }
@@ -149,16 +176,19 @@ class view {
                         <fieldset>
                             <legend>Login - Skriv in användarnamn och lösenord</legend>
                             <label for='name'>Namn</label>
-                            <input type='text' id='name' name='name' $currentUserName>
+                            <input type='text' id='name' name='name' $currentUserName >
                             <label for='pass'>Lösenord</label>
-                            <input type='text' id='pass' name='password'>
+                            <input type='password' id='pass' name='password'>
 
                         </fieldset>
                         <input type='submit' value='Logga in' name='loginButton' >
+                        <label for='rememberMe'>Håll mig inloggad</label>
+                        <input type='checkbox' name='rememberMe'>
                     </form>
 
                     <p>$date</p>
                     ";
+
 
 
 

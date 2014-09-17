@@ -1,1 +1,3 @@
-tester:mypass123
+tester:$2y$09$Bi5TM9R72Ti4ZGgCiXdKzesy70fbmJIlM9XNs1CBdWu6BqgBf4UhS
+admin:$2y$09$Bi5TM9R72Ti4ZGgCiXdKzepH8OeyYFCnxxbHxNk.X9VBgyDr0B.0C
+

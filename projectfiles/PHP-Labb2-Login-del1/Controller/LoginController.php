@@ -7,14 +7,14 @@
  */
 include_once("View/View.php");
 include_once("Model/UserModel.php");
+include_once("CookieJar.php");
 
 class LoginController{
-    private $view;
+    public $view;
     private $UserModel;
-    private $CookieJar;
 
     public function __construct(){
-        $this->CookieJar = new CookieJar();
+
         $this->UserModel = new UserModel();
         $this->view = new View($this->UserModel);
     }
@@ -24,7 +24,9 @@ class LoginController{
         if($this->view->ifPersonUsedLogin()){
             //Om personen har tryckt på loginknappen
 
-            if($this->view->ifPersonTriedToLogin()){
+            $haveUserBeenAccepted = $this->view->ifPersonTriedToLogin();
+
+            if($haveUserBeenAccepted){
                 //Om personen har  blivit godkänd
                 $clientID = $this->view->getClientidentifier();
 
@@ -32,7 +34,7 @@ class LoginController{
                 $this->UserModel->doLogin($clientID);
 
                 $ret = $this->view->userIsOnlineView();
-                //header("Location: " . $_SERVER["PHP_SELF"]);
+
                 return $ret;
             }
 
