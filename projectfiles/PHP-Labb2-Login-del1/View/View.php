@@ -9,6 +9,7 @@ require_once("Model/Date.php");
 require_once("Posted.php");
 include_once("CookieJar.php");
 
+
 class view {
     private $model;
     public $CookieJar;
@@ -55,6 +56,7 @@ class view {
         if(isset($_GET["loggedin"])){
             //om $_GET["loggedin"] finns så är det första gången sidan laddas
             //Då ska vi presentera ett meddelande.. här skapas meddelandet..
+            $_GET["loggedin"] = null; //undesettar denna...
 
             $welcomeString = "Inloggning lyckades";
 
@@ -64,18 +66,22 @@ class view {
             if(isset($_GET["rememberme"])){
                //Om rememberMe finns, så ska vi lägga till en ytterligare sak i välkommstexten...
                 $welcomeString .= " och vi kommer ihåg dig nästa gång";
+                $_GET["rememberme"] = null; // unsettar denna
 
             }
             if(isset($_GET["logintroughcookies"])){
                 $welcomeString .= " via cookies";
+                $_GET["logintroughcookies"] = null; //unsettar denna...
             }
 
             $this->CookieJar->save($welcomeString);
 
             //när meddelandet är satt ska sidan laddas om utan "loggedin"...
-            header("Location: " . $_SERVER["PHP_SELF"]);
+            return $this->userIsOnlineView();
+            //header("Location: " . $_SERVER["PHP_SELF"]);
 
         }else{
+
             if($this->hasUserdemandLogout()){
                 //Om en användare har tryckt på logga ut så ska vi tömma
                 $this->model->logoutUser();
@@ -130,6 +136,7 @@ class view {
 
     }
 
+
     public function ifPersonTriedToLogin(){
         //Vi testar om det angivna uppgifterna stämmer
         $hashedPassIfSucsess = $this->model->tryLogin(@$_POST["name"], @$_POST["password"]);
@@ -143,12 +150,16 @@ class view {
                 //Om den är det så ska vi spara undan lösen+användarnamn i kakor
                 //som ska återanvändas nästa gång sidan besöks...
                 $this->CookieJar->saveUserForRememberMe($_POST["name"],$hashedPassIfSucsess);
-                $forRememberMe = "&rememberme";
-                //$this->CookieJar = $this->CookieJar->setRememberMeToTrue();
+                //$forRememberMe = "&rememberme";
+                $this->CookieJar = $this->CookieJar->setRememberMeToTrue();
+
+                $_GET["rememberme"] = "";
             }
 
             //Vi lägger till GET så vi kan se när man precis loggat in...
-            header("Location: " . $_SERVER["PHP_SELF"] . "?loggedin" . $forRememberMe);
+            //var_dump($_SERVER);
+            //header("Location: " . $_SERVER["PHP_SELF"] . "?loggedin" . $forRememberMe);
+            $_GET["loggedin"] = "";
 
             return true;
         }else{

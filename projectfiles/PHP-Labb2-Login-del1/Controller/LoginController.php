@@ -36,12 +36,13 @@ class LoginController{
             }
         }
 
-        if($this->view->ifPersonUsedLogin()){
+        if($this->view->ifPersonUsedLogin() && $this->UserModel->isUserOnline() == false ){
             //Om personen har tryckt på loginknappen
-
             $haveUserBeenAccepted = $this->view->ifPersonTriedToLogin();
 
+
             if($haveUserBeenAccepted){
+
                 //Om personen har  blivit godkänd
                 $clientID = $this->view->getClientidentifier();
 
@@ -50,6 +51,7 @@ class LoginController{
 
                 $ret = $this->view->userIsOnlineView();
 
+
                 return $ret;
             }
 
@@ -57,6 +59,7 @@ class LoginController{
 
         }else{
             //vi kollar även om personen redan är inloggad..
+
             if($this->UserModel->isUserOnline()){
                 //I det fallet ska vi presentera utloggningssidan
 

@@ -5,14 +5,16 @@
  * Date: 2014-09-15
  * Time: 17:25
  */
+require_once("FileMaster.php");
 Class UserModel {
 
     private $name;
     private $password;
     private $userIsOnline; //online eller offline
+    private $fileMaster;
 
     public function __construct(){
-
+        $this->fileMaster = new FileMaster();
     }
 
     public function doLogin($clientID){
@@ -73,6 +75,7 @@ Class UserModel {
 
 
     }
+    /*
     public function tryLoginTroughCookies($username, $password){
         $users = file('View/users.txt');
         for($i=0;$i< count($users);$i++){
@@ -81,14 +84,14 @@ Class UserModel {
 
             }
         }
-    }
+    }*/
 
     public function tryLogin($username, $password, $loginTroughCookies = false){
         //användaren har tryckt på login knappen.
 
         //Först ska vi kolla om det finns en anvnädare med det angivna användarnamnet
         //1. hämta ner arrayen med användarnamn
-        $users = file('View/users.txt');
+        $users = $this->fileMaster->getUserOrPasswordList("username");
         //var_dump($users);
 
         for($i = 0; $i < count($users); $i++){
@@ -99,7 +102,7 @@ Class UserModel {
                 //Om det finns så ska vi kolla om lösenordet matchar användarens användarnamn
                 $userNameToMatchPassword = trim($users[$i]);
                 //Hämtar ner (det krypterade) lösenorden
-                $passList = file("View/usersPass.txt");
+                $passList = $this->fileMaster->getUserOrPasswordList("password");
                 $myRegEx = '/^'.$userNameToMatchPassword.':.*/'; //regulärt uttryck för att hitta användarens lösenord
 
                 for($j = 0; $j < count($passList); $j++ ){

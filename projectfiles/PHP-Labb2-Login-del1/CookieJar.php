@@ -5,17 +5,21 @@
  * Date: 2014-09-16
  * Time: 18:40
  */
+include_once("Model/SessionMaster.php");
+
 class CookieJar {
     //Class "tagen" från lektionsexempel : https://github.com/dntoll/1dv408-HT14/blob/master/Like/src/CookieStorage.php
     private static $cookieMessage = "CookieMessage";
     private static $cookieUserName = "CookieUserName";
     private static $cookieUserPass = "CookieUserPass";
-    private $timeStampForCookies;
     private $rememberMeIsUsed;
+    private $fileMaster;
+    static private $rememberMeSession = "rememberMe";
 
 
     public function __construct(){
         $this->rememberMeIsUsed = false;
+        $this->fileMaster = new FileMaster();
     }
 
     public function save($stringToSave){
@@ -48,7 +52,7 @@ class CookieJar {
     public function isCookieLegal(){
         //kollar så att ingen har manipulerat kakans tidsstämpel...
 
-        if(time() > $this->timeStampForCookies){
+        if(time() > $this->sessionMaster->LoadSessionValue(self::$rememberMeSession)){
             return false;
         }else{
             return true;
@@ -56,12 +60,15 @@ class CookieJar {
 
     }
 
+
     public function saveUserForRememberMe($userName, $userPass){
 
-        $this->timeStampForCookies = time() + 25;
+        //$this->sessionMaster->save(self::$rememberMeSession, time() + 50); //kakan sparas i 50 sekunder...
 
-        setcookie(self::$cookieUserName, $userName, $this->timeStampForCookies);
-        setcookie(self::$cookieUserPass, $userPass, $this->timeStampForCookies);
+        $timestamp = $this->fileMaster->setAndGetTimestamp($userName, 50);
+
+        setcookie(self::$cookieUserName, $userName, $timestamp);
+        setcookie(self::$cookieUserPass, $userPass, $timestamp);
 
 
     }
