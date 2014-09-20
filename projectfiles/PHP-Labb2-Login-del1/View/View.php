@@ -34,13 +34,18 @@ class view {
     }
 
     public function loginTroughCookies(){
-        $shouldBeTrue = $this->model->tryLogin($this->CookieJar->getUserOrPasswordFromCookie(true), $this->CookieJar->getUserOrPasswordFromCookie(false), true);
+        $userName = $this->CookieJar->getUserOrPasswordFromCookie(true);
+        $userPass = $this->CookieJar->getUserOrPasswordFromCookie(false);
+
+        $shouldBeTrue = $this->model->tryLogin($userName, $userPass, true);
 
         //kollar så att kakan är giltig...
-        $cookieIsLegal = $this->CookieJar->isCookieLegal();
+        $cookieIsLegal = $this->CookieJar->isCookieLegal($userName);
 
         if($shouldBeTrue && $cookieIsLegal){
-            header("Location: " . $_SERVER["PHP_SELF"] . "?loggedin" . "&logintroughcookies");
+            //header("Location: " . $_SERVER["PHP_SELF"] . "?loggedin" . "&logintroughcookies");
+            $_GET["loggedin"] = "";
+            $_GET["logintroughcookies"] = "";
             return true;
         }else{
             $this->CookieJar->clearUserForRememberMe();

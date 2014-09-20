@@ -36,8 +36,11 @@ class FileMaster {
 
         //skapar en pointer för fwrite med fopen...s
 
-        if($this->userDoesNotAlreadyExist(self::$TimestampFile, $userName)){
+        if($this->userDoesAlreadyExist(self::$TimestampFile, $userName) != false){
+        //Om den är något annat än falsk så har den retuernat ett tidsstämpeln
+
             //om timestamp finns så ska den bort.
+            $this->removeLineFromFile($userName, self::$TimestampFile);
         }
         //Skriver ny timestamp
         $pointer = fopen(self::$TimestampFile, 'a');
@@ -49,12 +52,33 @@ class FileMaster {
 
     function removeLineFromFile($whosLine, $fileToRemoveLineFrom){
 
-        
+        $fileToRemoveLineFromPointer = file($fileToRemoveLineFrom);
+
+        $myRegEx = '/^'.$whosLine.':.*/'; //regulärt uttryck för att hitta användarens kod
+        $rowsInNewFile = array();
+
+        foreach($fileToRemoveLineFromPointer as $line){
+            if(preg_match($myRegEx, trim($line)) == 0){ //om den inte matchar, spara raden.
+                $rowsInNewFile[] = $line; //alla rader som inte matchar ska sparas
+
+            }
+        }
+
+        // nu Tömmer vi filen och fyller på den med innehållet från den nya arrayen...
+        $fileToRemoveLineFromPointer = fopen($fileToRemoveLineFrom, 'w');
+        foreach($rowsInNewFile as $line){
+            fwrite($fileToRemoveLineFromPointer, $line); //ersätter det gamla raderna med de nya
+        }
 
     }
 
-    function userDoesNotAlreadyExist( $fileToCheck, $userToCheck){
-        //tar reda på om en användare redan finns på listan..
+    function returnTimestamp($userToCheck){
+    //denna funktion utnyttjar "userDoesAlreadyExist" och returnerar
+        return $this->userDoesAlreadyExist(self::$TimestampFile, $userToCheck);
+    }
+
+    function userDoesAlreadyExist( $fileToCheck, $userToCheck){
+        //tar reda på om en användare redan finns på listan.. om den finns, returnera timestamp
 
         $listToCheck = file($fileToCheck); //angivna listan görs om till array..
 
@@ -63,12 +87,14 @@ class FileMaster {
         for($i=0; $i<count($listToCheck);$i++){ //försöker hitta anvädnare
 
             if(preg_match($myRegEx, trim($listToCheck[$i])) == 1){
-                return false; //false = user does exist
+
+                $timeStamp = str_replace($userToCheck.":","", trim($listToCheck[$i]));
+                return $timeStamp; //false = user does exist (obs, ändrad. bara false om den inte finns, annars returnera tidsstämpeln
 
             }
 
         }
-        return true;
+        return false;
 
     }
 

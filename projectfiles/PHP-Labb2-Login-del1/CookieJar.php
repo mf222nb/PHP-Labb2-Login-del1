@@ -49,10 +49,10 @@ class CookieJar {
         return $returnThis;
     }
 
-    public function isCookieLegal(){
+    public function isCookieLegal($userToCheck){
         //kollar så att ingen har manipulerat kakans tidsstämpel...
 
-        if(time() > $this->sessionMaster->LoadSessionValue(self::$rememberMeSession)){
+        if(time() > $this->fileMaster->returnTimestamp($userToCheck)){
             return false;
         }else{
             return true;
