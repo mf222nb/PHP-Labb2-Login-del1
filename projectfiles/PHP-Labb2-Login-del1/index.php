@@ -16,6 +16,7 @@ $controller = new LoginController();
 
 $basePage = new HTMLview();
 $basePage->presentPage($controller->doControl());
+//var_dump($_SERVER);
 
 //var_dump($controller->view->CookieJar);
 //die();

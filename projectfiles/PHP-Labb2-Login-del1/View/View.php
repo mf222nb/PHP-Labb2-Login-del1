@@ -19,16 +19,27 @@ class view {
         $this->model = $model;
     }
 
-    public function getClientidentifier($loginTroughCookies = false){
+    public function getClientidentifier($loginTroughCookies = false, $withoutUserName = false){
         //returnerar det aktiva användarnamnet...
+        $arrayWithIdentifiers = [];
+        $arrayWithIdentifiers[UserModel::$clientIp] = $_SERVER["REMOTE_ADDR"];// 0: Clients IP
+        $arrayWithIdentifiers[UserModel::$clientBrowser] = $_SERVER["HTTP_USER_AGENT"];// 1: Clients browserdetails
+
+        if($withoutUserName){
+            //om ej användarnamn behövs så returnerar vi här
+            return $arrayWithIdentifiers;
+        }
+
         if($loginTroughCookies){
             //om $loginTroughCookies är true så ska användarnamnet i kakan returneras...
-            return $this->CookieJar->getUserOrPasswordFromCookie(true);
+            $arrayWithIdentifiers[UserModel::$clientOnline] = $this->CookieJar->getUserOrPasswordFromCookie(true); // 2: username
+            return $arrayWithIdentifiers;
 
         }else{
             //om kakor inte används, så har användaren loggat in och då hämtas namnet
             //via Post...
-            return $_POST["name"];
+            $arrayWithIdentifiers[UserModel::$clientOnline] = $_POST["name"]; // 2: username
+            return $arrayWithIdentifiers;
         }
 
     }
@@ -41,6 +52,9 @@ class view {
 
         //kollar så att kakan är giltig...
         $cookieIsLegal = $this->CookieJar->isCookieLegal($userName);
+
+        //Kollar om clienten är samma... (för sessionstölder...)
+
 
         if($shouldBeTrue && $cookieIsLegal){
             //header("Location: " . $_SERVER["PHP_SELF"] . "?loggedin" . "&logintroughcookies");

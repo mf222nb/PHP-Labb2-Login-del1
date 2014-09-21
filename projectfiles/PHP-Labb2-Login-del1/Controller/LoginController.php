@@ -29,7 +29,7 @@ class LoginController{
 
                 $clientID = $this->view->getClientidentifier(true);
 
-                //Gör användare inloggad
+                //Gör användare inloggad, sätter identifierare...
                 $this->UserModel->doLogin($clientID);
 
                 return $this->view->userIsOnlineView();
@@ -37,6 +37,7 @@ class LoginController{
         }
 
         if($this->view->ifPersonUsedLogin() && $this->UserModel->isUserOnline() == false ){
+
             //Om personen har tryckt på loginknappen
             $haveUserBeenAccepted = $this->view->ifPersonTriedToLogin();
 
@@ -60,12 +61,18 @@ class LoginController{
         }else{
             //vi kollar även om personen redan är inloggad..
 
+
             if($this->UserModel->isUserOnline()){
                 //I det fallet ska vi presentera utloggningssidan
 
-                //här skickar vi med en tomsträng, vi behöver inte
-                //berätta att inloggning lyckades här...
-                return $this->view->userIsOnlineView();
+                // eftersom inloggade användare kommer in här så ska vi se så de inte är sessionstjuvar.
+                if($this->UserModel->isNOTSessionThief($this->view->getClientidentifier(true, true))){
+                    //var_dump($this->UserModel->isNOTSessionThief($this->view->getClientidentifier(true, true)));
+                    //die();
+                    //här skickar vi med en tomsträng, vi behöver inte
+                    //berätta att inloggning lyckades här...
+                    return $this->view->userIsOnlineView();
+                }
             }
             $ret = $this->view->presentLoginForm();
 

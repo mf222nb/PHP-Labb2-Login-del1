@@ -12,20 +12,38 @@ Class UserModel {
     private $password;
     private $userIsOnline; //online eller offline
     private $fileMaster;
+    static $clientOnline = "ClientOnline";
+    static $clientIp = "ClientIp";
+    static $clientBrowser = "ClientBrowser";
 
     public function __construct(){
         $this->fileMaster = new FileMaster();
     }
 
-    public function doLogin($clientID){
+    public function isNOTSessionThief($clientIdentifier){
+        
+        if( $_SESSION[self::$clientIp] == $clientIdentifier[self::$clientIp]&&
+            $_SESSION[self::$clientBrowser] == $clientIdentifier[self::$clientBrowser]){
+            return true;
+        }
+        $this->logoutUser();
+        return false;
+    }
+
+    public function doLogin($identifier){
         //Användarnamnet+lösenordet är rätt, nu kan vi räknas som inloggade
 
-        $_SESSION["ClientOnline"] = $clientID;
+        $_SESSION[self::$clientOnline] = $identifier[self::$clientOnline];
+
+        //Här ska vi även sätta spärrar som berättar vad anvädnare använde för ip eller webbläsare.
+        $_SESSION[self::$clientIp] = $identifier[self::$clientIp];
+        $_SESSION[self::$clientBrowser] = $identifier[self::$clientBrowser];
 
     }
 
     public function isUserOnline(){
-        if(isset($_SESSION["ClientOnline"])){
+
+        if(isset($_SESSION[self::$clientOnline])){
             return true;
         }
 
@@ -33,7 +51,8 @@ Class UserModel {
     }
 
     public function logoutUser(){
-        $_SESSION["ClientOnline"] = null;
+
+        $_SESSION[self::$clientOnline] = null;
     }
 
     public function cryptPass($passwordToCrypt, $rounds = 9){
