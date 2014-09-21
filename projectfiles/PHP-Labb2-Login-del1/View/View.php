@@ -168,6 +168,7 @@ class view {
 
             //Här kollar vi också om "rememberMe" är ikryssad.
             if(@isset($_POST["rememberme"]) && $_POST["rememberme"] == "on"){
+
                 //Om den är det så ska vi spara undan lösen+användarnamn i kakor
                 //som ska återanvändas nästa gång sidan besöks...
                 $this->CookieJar->saveUserForRememberMe($_POST["name"],$hashedPassIfSucsess);
@@ -252,7 +253,7 @@ class view {
 
                         </fieldset>
                         <input type='submit' value='Logga in' name='loginButton' >
-                        <label for='rememberme'>Håll mig inloggad</label>
+                        <label for='rememberme'>Håll mig inloggad.</label>
                         <input type='checkbox' name='rememberme' id='rememberme'>
                     </form>
 

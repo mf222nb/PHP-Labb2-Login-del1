@@ -18,6 +18,7 @@ class HTMLview{
                 </head>
                 <body>
                     $content
+                    <p style='bottom: 0; position: absolute; color: red; font-weight: bold;'>Obs, sidan använder cookies, genom att använda applikationen godkänner du cookies.</p>
                 </body>
                 </html>
 
