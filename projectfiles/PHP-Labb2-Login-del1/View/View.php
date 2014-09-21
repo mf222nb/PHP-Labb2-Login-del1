@@ -19,11 +19,11 @@ class view {
         $this->model = $model;
     }
 
-    public function getClientidentifier($loginTroughCookies = false, $withoutUserName = false){
-        //returnerar det aktiva användarnamnet...
+    public function getClientidentifier($loginTroughCookies = false, $withoutUserName = false){ //parametrarna är som standard false...
+    //returnerar det aktiva användarnamnet, ip och webbläsarinfo som identifierare...
         $arrayWithIdentifiers = array();
-        $arrayWithIdentifiers[UserModel::$clientIp] = $_SERVER["REMOTE_ADDR"];// 0: Clients IP
-        $arrayWithIdentifiers[UserModel::$clientBrowser] = $_SERVER["HTTP_USER_AGENT"];// 1: Clients browserdetails
+        $arrayWithIdentifiers[UserModel::$clientIp] = $_SERVER["REMOTE_ADDR"];// Clients IP
+        $arrayWithIdentifiers[UserModel::$clientBrowser] = $_SERVER["HTTP_USER_AGENT"];//  Clients browserdetails
 
         if($withoutUserName){
             //om ej användarnamn behövs så returnerar vi här
@@ -36,8 +36,7 @@ class view {
             return $arrayWithIdentifiers;
 
         }else{
-            //om kakor inte används, så har användaren loggat in och då hämtas namnet
-            //via Post...
+            //om kakor inte används, så har användaren loggat in och då hämtas namnet via Post...
             $arrayWithIdentifiers[UserModel::$clientOnline] = $_POST["name"]; // 2: username
             return $arrayWithIdentifiers;
         }
@@ -45,23 +44,29 @@ class view {
     }
 
     public function loginTroughCookies(){
+        //hämtar ut användaruppgifterna i kakorna
         $userName = $this->CookieJar->getUserOrPasswordFromCookie(true);
         $userPass = $this->CookieJar->getUserOrPasswordFromCookie(false);
 
+        //Testar om användarnamnet och lösenordet är giltiga
         $shouldBeTrue = $this->model->tryLogin($userName, $userPass, true);
 
-        //kollar så att kakan är giltig...
+        //kollar så att kakan är giltig... (tidsstämpeln ej för gammal..)
         $cookieIsLegal = $this->CookieJar->isCookieLegal($userName);
 
-        //Kollar om clienten är samma... (för sessionstölder...)
+        //Sessionstölder kollas också, men det görs genom
+        //LoginController>doControl>...>is userOnline (rad68)> här görs sessionstöldskollarna
 
 
         if($shouldBeTrue && $cookieIsLegal){
             //header("Location: " . $_SERVER["PHP_SELF"] . "?loggedin" . "&logintroughcookies");
+            //header location förstörde, så jag satte GETs manuellt...
             $_GET["loggedin"] = "";
             $_GET["logintroughcookies"] = "";
             return true;
         }else{
+            //om något inte stämmer så slängs datan och ett felmeddelande sparas för
+            //att visas på loginskärmen...
             $this->CookieJar->clearUserForRememberMe();
             $this->CookieJar->save("<p>Felaktig information i cookie</p></ b>");
 
@@ -75,53 +80,60 @@ class view {
         if(isset($_GET["loggedin"])){
             //om $_GET["loggedin"] finns så är det första gången sidan laddas
             //Då ska vi presentera ett meddelande.. här skapas meddelandet..
-            $_GET["loggedin"] = null; //undesettar denna...
+            $_GET["loggedin"] = null; //undesettar denna för att det inte påverkas nästa gång
 
+            //Börjar på strängen som alltid kommer användas vid inloggning
             $welcomeString = "Inloggning lyckades";
-
-            //var_dump($this);
-            //die();
 
             if(isset($_GET["rememberme"])){
                //Om rememberMe finns, så ska vi lägga till en ytterligare sak i välkommstexten...
                 $welcomeString .= " och vi kommer ihåg dig nästa gång";
-                $_GET["rememberme"] = null; // unsettar denna
+                $_GET["rememberme"] = null; // unsettar denna för att det inte påverkas nästa gång
 
             }
             if(isset($_GET["logintroughcookies"])){
+                //samma som övre if-satsen..
                 $welcomeString .= " via cookies";
-                $_GET["logintroughcookies"] = null; //unsettar denna...
+                $_GET["logintroughcookies"] = null; //unsettar denna......
             }
 
+            //sparar ner strängen för senare bruk
             $this->CookieJar->save($welcomeString);
 
-            //när meddelandet är satt ska sidan laddas om utan "loggedin"...
+            //när meddelandet är satt ska sidan laddas om utan "loggedin" (som vi nullade)...
+            //då returneras detta och kör else-satsen istället...
             return $this->userIsOnlineView();
-            //header("Location: " . $_SERVER["PHP_SELF"]);
+            //header("Location: " . $_SERVER["PHP_SELF"]); <-- detta är djävulen, jag lovar...
 
         }else{
 
             if($this->hasUserdemandLogout()){
-                //Om en användare har tryckt på logga ut så ska vi tömma
+                //Om en användare har tryckt på logga ut så ska vi tömma sessionsvariablarna som
+                //identifierar inloggade användare...
                 $this->model->logoutUser();
 
-                //Vi vill också tömma eventuella kakor...
+                //Vi vill också tömma eventuella kakor, om de finns...
                 if($this->doesCookiesExist()){
                     $this->CookieJar->clearUserForRememberMe();
                 }
 
+                //sparar undan felmeddelande till senare
                 $this->CookieJar->save("Du har nu loggat ut!");
+
                 //vi laddar om sidan, och har förberett ett meddelande till clienten
                 header("Location: " . $_SERVER["PHP_SELF"]);
+                //^här är header(loc... ok då vi ändå inte behöver spara några variabler etc..
+                //header(loc... börjar om från index.php och tömmer alla variabler som appen sparat...
             }else{
+                //om ingen utloggning efterfrågas så presenteras eventuella meddelande och inloggadskärm.
                 $message = $this->CookieJar->load();
+
                 $viewToReturn = "
                     $message
                     <p>Du är inloggad!</p>
                     <a href='?logout'>Logga ut</a>
                     ";
-                //var_dump($message);
-                //die();
+
                 return $viewToReturn;
             }
 
@@ -157,14 +169,13 @@ class view {
 
 
     public function ifPersonTriedToLogin(){
-        //Vi testar om det angivna uppgifterna stämmer
+    //Vi testar om det angivna uppgifterna stämmer
+        //hämtar ner inloggningsuppfterna och testar dessa med tryLogin
         $hashedPassIfSucsess = $this->model->tryLogin(@$_POST["name"], @$_POST["password"]);
 
         if($hashedPassIfSucsess != false){
-            // $hashedPassIfSucsess innehåller antingen det hashade lösenordet (om lyckad inloggning)
-            // eller false, om lösenordet ej stämde...
-
-            $forRememberMe = "";
+        // $hashedPassIfSucsess innehåller antingen det hashade lösenordet (om lyckad inloggning)
+        // eller false, om lösenordet ej stämde...
 
             //Här kollar vi också om "rememberMe" är ikryssad.
             if(@isset($_POST["rememberme"]) && $_POST["rememberme"] == "on"){
@@ -172,16 +183,16 @@ class view {
                 //Om den är det så ska vi spara undan lösen+användarnamn i kakor
                 //som ska återanvändas nästa gång sidan besöks...
                 $this->CookieJar->saveUserForRememberMe($_POST["name"],$hashedPassIfSucsess);
-                //$forRememberMe = "&rememberme";
-                $this->CookieJar = $this->CookieJar->setRememberMeToTrue();
 
+                //anger en get som bekräftelse för att rememberme används, denna kollas av i userIsOnlineView
                 $_GET["rememberme"] = "";
             }
 
             //Vi lägger till GET så vi kan se när man precis loggat in...
-            //var_dump($_SERVER);
-            //header("Location: " . $_SERVER["PHP_SELF"] . "?loggedin" . $forRememberMe);
             $_GET["loggedin"] = "";
+
+            //header("Location: " . $_SERVER["PHP_SELF"] . "?loggedin" . $forRememberMe);
+                //^djävul!!! förstörde allt ett tag..
 
             return true;
         }else{

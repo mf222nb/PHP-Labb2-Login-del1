@@ -12,13 +12,10 @@ class CookieJar {
     private static $cookieMessage = "CookieMessage";
     private static $cookieUserName = "CookieUserName";
     private static $cookieUserPass = "CookieUserPass";
-    private $rememberMeIsUsed;
     private $fileMaster;
-    static private $rememberMeSession = "rememberMe";
 
 
     public function __construct(){
-        $this->rememberMeIsUsed = false;
         $this->fileMaster = new FileMaster();
     }
 
@@ -35,7 +32,7 @@ class CookieJar {
     public function load(){
 
         if(isset($_COOKIE[self::$cookieMessage])){
-            //om det finns något i kakan så ska det returneras
+        //om det finns något i kakan så ska det returneras
             $returnThis = $_COOKIE[self::$cookieMessage];
         }else{
             $returnThis = ""; //annars returnerar vi tomsträng...
@@ -63,14 +60,10 @@ class CookieJar {
 
     public function saveUserForRememberMe($userName, $userPass){
 
-        //$this->sessionMaster->save(self::$rememberMeSession, time() + 50); //kakan sparas i 50 sekunder...
-
         $timestamp = $this->fileMaster->setAndGetTimestamp($userName, 50);
 
         setcookie(self::$cookieUserName, $userName, $timestamp);
         setcookie(self::$cookieUserPass, $userPass, $timestamp);
-
-
     }
 
     public function getUserOrPasswordFromCookie($trueForUser){
@@ -86,15 +79,6 @@ class CookieJar {
     public function clearUserForRememberMe(){
         setcookie(self::$cookieUserName, null, -1);
         setcookie(self::$cookieUserPass, null, -1);
-    }
-
-    public function setRememberMeToTrue(){
-        $this->rememberMeIsUsed = true;
-        return $this;
-    }
-
-    public function isRememberMeUsed(){
-        return $this->rememberMeIsUsed;
     }
 
 }

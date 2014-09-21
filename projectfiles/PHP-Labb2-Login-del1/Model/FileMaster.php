@@ -13,6 +13,7 @@ class FileMaster {
     static $TimestampFile = "Model/usersCookieTimestamp.txt";
 
     function getUserOrPasswordList($choice){
+    //returnerar användarnamn eller lösenord
         $listToReturn = "";
 
         switch($choice){
@@ -30,28 +31,28 @@ class FileMaster {
     }
 
     function setAndGetTimestamp($userName, $ammoutOfTime = 50){
-
+    //funktion som lägger in en tidstämpel på en användare.
+    //om tidstämpeln är yngre än kakan som är satt till användaren. Och tidstämpen har gått ut, då är kakan ogiltig
         $TimeStamp = time() + $ammoutOfTime;
+
         //Lägg till tidstämpeln och användarnamnet i filen..
-
-        //skapar en pointer för fwrite med fopen...s
-
         if($this->userDoesAlreadyExist(self::$TimestampFile, $userName) != false){
-        //Om den är något annat än falsk så har den retuernat ett tidsstämpeln
+        //Om den är något annat än falsk så har den retuernat en tidsstämpel
+        //returnerar bara tidstämplar från användare som har = annars finns inget att ta bort
 
             //om timestamp finns så ska den bort.
             $this->removeLineFromFile($userName, self::$TimestampFile);
         }
-        //Skriver ny timestamp
+        //Lägger till den nya timestampen...
         $pointer = fopen(self::$TimestampFile, 'a');
         fwrite($pointer,$userName . ":" . $TimeStamp . "\n");
 
-        return $TimeStamp;
+        return $TimeStamp; //returnerar den...
 
     }
 
     function removeLineFromFile($whosLine, $fileToRemoveLineFrom){
-
+    //tar bort en rad i en fil, baserat på vem som äger raden och vilken fil den ska leta i
         $fileToRemoveLineFromPointer = file($fileToRemoveLineFrom);
 
         $myRegEx = '/^'.$whosLine.':.*/'; //regulärt uttryck för att hitta användarens kod
@@ -73,12 +74,12 @@ class FileMaster {
     }
 
     function returnTimestamp($userToCheck){
-    //denna funktion utnyttjar "userDoesAlreadyExist" och returnerar
+    //denna funktion utnyttjar "userDoesAlreadyExist" och returnerar timestamp
         return $this->userDoesAlreadyExist(self::$TimestampFile, $userToCheck);
     }
 
     function userDoesAlreadyExist( $fileToCheck, $userToCheck){
-        //tar reda på om en användare redan finns på listan.. om den finns, returnera timestamp
+    //tar reda på om en användare redan finns på listan.. om den finns, returnera timestamp
 
         $listToCheck = file($fileToCheck); //angivna listan görs om till array..
 
@@ -97,18 +98,6 @@ class FileMaster {
         return false;
 
     }
-
-    function loadTimeStampfromUser($userName){
-        $timeStamp = $this->findUsersCode($userName);
-    }
-
-    function findUsersCode($userName, $file){
-
-        $myRegEx = '/^'.$userName.':.*/'; //regulärt uttryck för att hitta användaren
-        //preg_match($myRegEx,trim($passList[$j]);
-
-    }
-
 
 
 }

@@ -11,20 +11,12 @@ require_once("HTMLview.php");
 
 session_start();
 
-//$date = new Date();
+//enligt mvc, skapa logincontroller (vår kontroller)
 $controller = new LoginController();
 
+//skapa också vår htmlgrund, som hämtar data att fylla bodyn med från vår kontroller...
 $basePage = new HTMLview();
 $basePage->presentPage($controller->doControl());
-//var_dump($_SERVER);
 
-//var_dump($controller->view->CookieJar);
-//die();
 
-/*
-$dateAndTime = $date->getDateTime(true);
 
-$basePage = new HTMLview();
-
-$basePage->presentPage("Test + " . $dateAndTime);
-*/
