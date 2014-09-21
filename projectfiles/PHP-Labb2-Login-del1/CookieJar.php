@@ -25,7 +25,7 @@ class CookieJar {
     public function save($stringToSave){
 
         setcookie(self::$cookieMessage, $stringToSave, -1);
-        $_COOKIE["CookieMessage"] = $stringToSave; //säkerhetsåtgärd... (tips från skolan..)
+        $_COOKIE["CookieMessage"] = "<p>".$stringToSave."</p></ b>"; //säkerhetsåtgärd... (tips från skolan..)
         //Sparar kakan i cookiearrayens nyckel "CookieMessage"
         //Värdet är värdet av $stringToSave
         //-1 = kakan försvinner när sessionen är klar.

@@ -21,7 +21,7 @@ Class UserModel {
     }
 
     public function isNOTSessionThief($clientIdentifier){
-        
+
         if( $_SESSION[self::$clientIp] == $clientIdentifier[self::$clientIp]&&
             $_SESSION[self::$clientBrowser] == $clientIdentifier[self::$clientBrowser]){
             return true;
@@ -58,6 +58,7 @@ Class UserModel {
     public function cryptPass($passwordToCrypt, $rounds = 9){
         //krypterar lösenordet med blowfish, har följt denna guide https://www.youtube.com/watch?v=wIRtl8CwgIc
         //returnerar det krypterade lösenordet
+        //OBS: blowfish verkar kräva nyare version av php. version.5.2.12 verkar ej funka...
 
         $salt = "";
 
@@ -71,7 +72,8 @@ Class UserModel {
 
         //Nu ska vi kryptera och returnera det krypterade lösenordet!
 
-        return crypt($passwordToCrypt, sprintf("$2y$%02d$", $rounds) . $salt);
+
+        return crypt($passwordToCrypt, sprintf("$2y$%02d$", $rounds) . $salt);//
         // "$2y$%02d$" är den delen som gör att vi krypterar genom blowfish, endast "$2y$" är nödvändigt
         // det andra är "extra saker" som killen i videon sa var bra (hörde inte riktigt...)
     }
@@ -79,12 +81,13 @@ Class UserModel {
     public function checkIfPasswordIstrue($inputFromUser, $usersHashedPassword){
         //vi krypterar det inmatade lösenordet, testar om det är samma som användarens lösenord
         //om så är fallet så stämde lösenordet...
+
         $shouldBeSameAsHashed = crypt($inputFromUser, $usersHashedPassword);
 
         //var_dump($shouldBeSameAsHashed);
         //var_dump($usersHashedPassword);
-        //var_dump($inputFromUser);
-        //die();
+        //var_dump($shouldBeSameAsHashed);
+        //die(); //jag är tröttss
 
         if($shouldBeSameAsHashed == $usersHashedPassword){
             return true;
@@ -143,6 +146,7 @@ Class UserModel {
                         //var_dump($onlyPass);//$this->cryptPass($onlyPass)
                         //var_dump($this->checkIfPasswordIstrue($password,$onlyPass));
                         //die();
+
                         if($loginTroughCookies){
 
                             if($password == $onlyPass){

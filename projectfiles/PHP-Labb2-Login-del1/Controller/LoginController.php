@@ -65,6 +65,7 @@ class LoginController{
             if($this->UserModel->isUserOnline()){
                 //I det fallet ska vi presentera utloggningssidan
 
+
                 // eftersom inloggade användare kommer in här så ska vi se så de inte är sessionstjuvar.
                 if($this->UserModel->isNOTSessionThief($this->view->getClientidentifier(true, true))){
                     //var_dump($this->UserModel->isNOTSessionThief($this->view->getClientidentifier(true, true)));
@@ -74,6 +75,7 @@ class LoginController{
                     return $this->view->userIsOnlineView();
                 }
             }
+
             $ret = $this->view->presentLoginForm();
 
             return $ret;
