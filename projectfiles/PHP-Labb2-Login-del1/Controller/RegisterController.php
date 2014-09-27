@@ -10,6 +10,7 @@ require_once("./Model/UserModel.php");
 require_once("./Helper/UsernameToShortException.php");
 require_once("./Helper/PasswordToShortException.php");
 require_once("./Helper/PasswordDontMatchException.php");
+require_once("./Model/User.php");
 
 class RegisterController {
     private $registerUserView;
@@ -29,6 +30,8 @@ class RegisterController {
             try{
                 if($this->userModel->registerAuthentication($password, $repeatPass, $username)){
                     $cryptPass = $this->userModel->cryptPass($password);
+                    $user = new User($username, $cryptPass);
+                    $this->userModel->addUser($user);
                 }
             }
             catch(UsernameToShortException $e){

@@ -12,6 +12,7 @@ Class UserModel extends Repository{
     static $clientOnline = "ClientOnline";
     static $clientIp = "ClientIp";
     static $clientBrowser = "ClientBrowser";
+
     private $db;
     private static $name = 'Username';
     private static $pass = 'Password';
@@ -167,6 +168,15 @@ Class UserModel extends Repository{
     }
 
     public function addUser(User $user){
-        $sql = "INSERT INTO $this->dbTable (" . self::$name . ", " . self::$pass . ") VALUES (?, ?)";
+        try{
+            $sql = "INSERT INTO $this->dbTable (" . self::$name . ", " . self::$pass . ") VALUES (?, ?)";
+            $params = array($user->getUsername(), $user->getPassword());
+
+            $query = $this->db->prepare($sql);
+            $query->execute($params);
+        }
+        catch(PDOException $e){
+
+        }
     }
 }
