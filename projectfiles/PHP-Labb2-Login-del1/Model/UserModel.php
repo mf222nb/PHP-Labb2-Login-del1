@@ -6,14 +6,20 @@
  * Time: 17:25
  */
 require_once("FileMaster.php");
-Class UserModel {
+require_once("Repository.php");
+Class UserModel extends Repository{
     private $fileMaster;
     static $clientOnline = "ClientOnline";
     static $clientIp = "ClientIp";
     static $clientBrowser = "ClientBrowser";
+    private $db;
+    private static $name = 'Username';
+    private static $pass = 'Password';
 
     public function __construct(){
         $this->fileMaster = new FileMaster();
+        $this->db = $this->connection();
+        $this -> dbTable = 'user';
     }
 
     public function isNOTSessionThief($clientIdentifier){
@@ -145,5 +151,22 @@ Class UserModel {
             }
         }
         return false;
+    }
+
+    public function registerAuthentication($password, $repeatPass, $username){
+        if(mb_strlen($username) < 3){
+            throw new UsernameToShortException();
+        }
+        if(mb_strlen($password) < 6 || mb_strlen($repeatPass) <6){
+            throw new PasswordToShortException();
+        }
+        if($password != $repeatPass){
+            throw new PasswordDontMatchException();
+        }
+        return true;
+    }
+
+    public function addUser(User $user){
+        $sql = "INSERT INTO $this->dbTable (" . self::$name . ", " . self::$pass . ") VALUES (?, ?)";
     }
 }

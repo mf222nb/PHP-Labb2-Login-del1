@@ -249,6 +249,7 @@ class view {
 
         //Htmln som ska åka ut på klienten
         $ToClient ="
+                    <a href='?Register'>Registrera ny användare</a>
                     <h3>Ej inloggad</h3>
 
                     <form  method='post'>
@@ -271,12 +272,14 @@ class view {
                     <p>$date</p>
                     ";
 
-
-
-
         return $ToClient;
-
     }
 
+    public function register(){
+        if(isset($_GET["Register"])){
+            return true;
+        }
+        return false;
+    }
 
 }
