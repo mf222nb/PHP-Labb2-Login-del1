@@ -9,7 +9,7 @@
 abstract class Repository {
     protected $dbUsername = 'root';
     protected $dbPassword = '';
-    protected $dbConnstring = 'mysql:host=localhost;dbname=loginapp';
+    protected $dbConnstring = 'mysql:host=127.0.0.1;dbname=loginapp';
     protected $dbConnection;
     protected $dbTable;
 

@@ -9,12 +9,12 @@ include_once("View/View.php");
 include_once("Model/UserModel.php");
 include_once("CookieJar.php");
 include_once("View/RegisterUserView.php");
+include_once("RegisterController.php");
 
 class LoginController{
     public $view;
     private $UserModel;
     private $registerUserView;
-
     public function __construct(){
 
         $this->UserModel = new UserModel();
