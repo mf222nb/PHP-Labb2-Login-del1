@@ -13,6 +13,7 @@ include_once("CookieJar.php");
 class view {
     private $model;
     public $CookieJar;
+    private $message;
 
     public function __construct($model){
         $this->CookieJar = new CookieJar();
@@ -252,11 +253,12 @@ class view {
                     <a href='?Register'>Registrera ny användare</a>
                     <h3>Ej inloggad</h3>
 
-                    <form  method='post'>
+                    <form  method='post' action='?login'>
                         <fieldset>
                         $message
                         $message2
                         $message3
+                        $this->message
                             <legend>Login - Skriv in användarnamn och lösenord</legend>
                             <label for='name'>Namn</label>
                             <input type='text' id='name' name='name' $currentUserName >
@@ -282,4 +284,7 @@ class view {
         return false;
     }
 
+    public function userAddedToDataBaseMessage(){
+        $this->message = "<p>Registrering av ny användare lyckades</p>";
+    }
 }

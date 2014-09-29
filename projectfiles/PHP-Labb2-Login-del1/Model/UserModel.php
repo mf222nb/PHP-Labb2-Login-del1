@@ -12,6 +12,7 @@ Class UserModel extends Repository{
     static $clientOnline = "ClientOnline";
     static $clientIp = "ClientIp";
     static $clientBrowser = "ClientBrowser";
+    private $regExp = '/[^a-z0-9\-_\.]/i';
 
     private $db;
     private static $name = 'Username';
@@ -103,60 +104,73 @@ Class UserModel extends Repository{
 
         //Först ska vi kolla om det finns en anvnädare med det angivna användarnamnet
         //1. hämta ner arrayen med användarnamn
-        $users = $this->fileMaster->getUserOrPasswordList("username");
+        //$users = $this->fileMaster->getUserOrPasswordList("username");
 
-        for($i = 0; $i < count($users); $i++){
+        //for($i = 0; $i < count($users); $i++){
 
-            if(trim($users[$i]) === $username){
+            //if(trim($users[$i]) === $username){
             //Om användarnamnet finns så ska vi kolla om lösenordet matchar användarens användarnamn
 
-                $userNameToMatchPassword = trim($users[$i]);
+                //$userNameToMatchPassword = trim($users[$i]);
                 //Hämtar ner (det krypterade) lösenorden
-                $passList = $this->fileMaster->getUserOrPasswordList("password");
-                $myRegEx = '/^'.$userNameToMatchPassword.':.*/'; //regulärt uttryck för att hitta användarens lösenord
+                //$passList = $this->fileMaster->getUserOrPasswordList("password");
+                //$myRegEx = '/^'.$userNameToMatchPassword.':.*/'; //regulärt uttryck för att hitta användarens lösenord
 
-                for($j = 0; $j < count($passList); $j++ ){
-                    $passList[$j]; //användarnamnet + hashat lösenordet...
+                //for($j = 0; $j < count($passList); $j++ ){
+                    //$passList[$j]; //användarnamnet + hashat lösenordet...
 
-                    if(preg_match($myRegEx,trim($passList[$j]))== 1){
+                    //if(preg_match($myRegEx,trim($passList[$j]))== 1){
                         //Om reg. matchar användarnamnet så har vi hittat lösenordet
 
                         //Tar bort den delen som identiferar vems lösenord det är (så bara lösenordet är kvar..)
-                        $onlyPass = str_replace($userNameToMatchPassword.":", "" , $passList[$j]);
-                        $onlyPass = trim($onlyPass);
+                        //$onlyPass = str_replace($userNameToMatchPassword.":", "" , $passList[$j]);
+                        //$onlyPass = trim($onlyPass);
 
+        $sql = "SELECT * FROM $this->dbTable WHERE " . self::$name . " = ?";
+        $params = array($username);
 
-                        if($loginTroughCookies){
-                        //om vi loggar in genom kakor så ska vi inte hasha lösenordet, bara jämföra...
+        $query = $this->db->prepare($sql);
+        $query->execute($params);
 
-                            if($password == $onlyPass){
-                                return true;
-                            }else{
-                                //om detta ej stämmer så är det något fel på kakan
-                                //den är troligtvis manipulerad, vi ska ta bort allt då...(görs i kakmetoden)
-                                return false;
-                            }
+        $result = $query->fetch();
 
-                        }else{
-                        // om $loginTroughCookies inte används, så är det en vanlig inloggning
+        $onlyPass = $result["Password"];
 
-                            //crypterar det angivna lösenordet och testar om det är samma som användarens
-                            if($this->checkIfPasswordIstrue($password,$onlyPass)){
-                                return $onlyPass;
-                                //vi returnerar det hashade lösenordet om
-                                //det stämde, då kan vi (om vi vill) lägga den i en kaka...
-                            }
-                        }
-                    }
-                }
+        if($loginTroughCookies){
+        //om vi loggar in genom kakor så ska vi inte hasha lösenordet, bara jämföra...
+
+            if($password == $onlyPass){
+                return true;
+            }else{
+                //om detta ej stämmer så är det något fel på kakan
+                //den är troligtvis manipulerad, vi ska ta bort allt då...(görs i kakmetoden)
+                return false;
+            }
+
+        }else{
+        // om $loginTroughCookies inte används, så är det en vanlig inloggning
+
+            //crypterar det angivna lösenordet och testar om det är samma som användarens
+            if($this->checkIfPasswordIstrue($password,$onlyPass)){
+                return $onlyPass;
+                //vi returnerar det hashade lösenordet om
+                //det stämde, då kan vi (om vi vill) lägga den i en kaka...
             }
         }
+                    //}
+                //}
+            //}
+        //}
         return false;
     }
 
     public function registerAuthentication($password, $repeatPass, $username){
         if(mb_strlen($username) < 3){
             throw new UsernameToShortException();
+        }
+        if(preg_match($this->regExp, $username)){
+            $username = preg_replace($this->regExp, "", $username);
+            throw new UsernameContainsInvalidCharactersException($username);
         }
         if(mb_strlen($password) < 6 || mb_strlen($repeatPass) <6){
             throw new PasswordToShortException();
@@ -176,7 +190,26 @@ Class UserModel extends Repository{
             $query->execute($params);
         }
         catch(PDOException $e){
+            die("Ett oväntat fel har uppstått");
+        }
+    }
 
+    public function UserAlreadyExist($username){
+        try{
+            $sql = "SELECT * FROM $this->dbTable WHERE " . self::$name . " = ?";
+            $params = array($username);
+
+            $query = $this->db->prepare($sql);
+            $query->execute($params);
+
+            $result = $query->fetch();
+
+            if($result["Username"] == $username){
+                return true;
+            }
+        }
+        catch(PDOException $e){
+            die("Ett oväntat fel har uppstått");
         }
     }
 }

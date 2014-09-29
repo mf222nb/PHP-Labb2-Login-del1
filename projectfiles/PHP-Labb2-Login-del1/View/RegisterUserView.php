@@ -86,4 +86,13 @@ class RegisterUserView {
     public function passwordDontMatchMessage(){
         $this->message2 = "Lösenorden matchar inte.";
     }
+
+    public function usernameAlreadyExistMessage(){
+        $this->message = "Användarnamnet är redan upptaget";
+    }
+
+    public function usernameContainInvalidCharacterMessage($e){
+        $this->username = $e;
+        $this->message = "Användarnamnet innehåller ogiltiga tecken";
+    }
 }
