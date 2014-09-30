@@ -14,6 +14,7 @@ Class UserModel extends Repository{
     static $clientBrowser = "ClientBrowser";
     private $regExp = '/[^a-z0-9\-_\.]/i';
 
+    //Variabler som har med databasen att göra.
     private $db;
     private static $name = 'Username';
     private static $pass = 'Password';
@@ -126,14 +127,18 @@ Class UserModel extends Repository{
                         //$onlyPass = str_replace($userNameToMatchPassword.":", "" , $passList[$j]);
                         //$onlyPass = trim($onlyPass);
 
+        //Istället för att läsa från en fil så läser jag från en databas och hämtar ut användarnamn och tillhörande
+        //lösenord.
         $sql = "SELECT * FROM $this->dbTable WHERE " . self::$name . " = ?";
         $params = array($username);
 
         $query = $this->db->prepare($sql);
         $query->execute($params);
 
+        //$result är en array som innehåller både användarnamn och lösenord.
         $result = $query->fetch();
 
+        //Hämtar ut lösenordet och sparar i en variabel.
         $onlyPass = $result["Password"];
 
         if($loginTroughCookies){
@@ -164,7 +169,11 @@ Class UserModel extends Repository{
         return false;
     }
 
+    //Kontroller med regler om vad som gäller för användarnamn och lösenord.
     public function registerAuthentication($password, $repeatPass, $username){
+        if(mb_strlen($username) < 3 && mb_strlen($password) < 6 && mb_strlen($repeatPass) <6){
+            throw new UsernameAndPasswordToShortException();
+        }
         if(mb_strlen($username) < 3){
             throw new UsernameToShortException();
         }
@@ -181,6 +190,7 @@ Class UserModel extends Repository{
         return true;
     }
 
+    //Lägger till en användare till en databas
     public function addUser(User $user){
         try{
             $sql = "INSERT INTO $this->dbTable (" . self::$name . ", " . self::$pass . ") VALUES (?, ?)";
@@ -194,6 +204,8 @@ Class UserModel extends Repository{
         }
     }
 
+    //En SQL-fråga som kollar om ett användarnamn redan finns i databasen och i sådana fall ska man inte kunna
+    //lägga till en ny användare.
     public function UserAlreadyExist($username){
         try{
             $sql = "SELECT * FROM $this->dbTable WHERE " . self::$name . " = ?";
@@ -211,5 +223,10 @@ Class UserModel extends Repository{
         catch(PDOException $e){
             die("Ett oväntat fel har uppstått");
         }
+    }
+
+    //Hämtar ut användarnamnet från en session
+    public function getUsername(){
+        return $_SESSION[self::$clientOnline];
     }
 }

@@ -11,6 +11,7 @@ require_once("./Helper/UsernameToShortException.php");
 require_once("./Helper/PasswordToShortException.php");
 require_once("./Helper/PasswordDontMatchException.php");
 require_once("./Helper/UsernameContainsInvalidCharactersException.php");
+require_once("./Helper/UsernameAndPasswordToShortException.php");
 require_once("./Model/User.php");
 require_once("./View/View.php");
 require_once("./Controller/LoginController.php");
@@ -29,6 +30,12 @@ class RegisterController {
     }
 
     public function doControl(){
+        /*Om användaren trycker på Register knappen så hämtar vi ut information om vad användaren skrev in i fälten
+        och sedan kollar vi så att de uppfyller alla kraven så som längd etc, och om de gör det så tittar vi om
+        användarnamnet är ledigt. Är användarnamnet ledigt så krypterar vi lösenordet och sedan lägger till det i
+        databasen och man kommer tillbaka till loginviewn.
+
+        Om något går fel så får användaren ett felmeddelande av något slag.*/
         if($this->registerUserView->didUserPressRegister()){
             $this->registerUserView->getRegisterInformation();
             $username = $this->registerUserView->getUsername();
@@ -59,6 +66,9 @@ class RegisterController {
             }
             catch(UsernameContainsInvalidCharactersException $e){
                 $this->registerUserView->usernameContainInvalidCharacterMessage($e->getMessage());
+            }
+            catch(UsernameAndPasswordToShortException $e){
+                $this->registerUserView->usernameAndPasswordToShortMessage();
             }
         }
         $ret = $this->registerUserView->registerUserView();

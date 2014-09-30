@@ -95,4 +95,9 @@ class RegisterUserView {
         $this->username = $e;
         $this->message = "Användarnamnet innehåller ogiltiga tecken";
     }
+
+    public function usernameAndPasswordToShortMessage(){
+        $this->message = "Användarnamnet har för få tecken. Minst 3 tecken";
+        $this->message2 = "Lösenorden har för få tecken. Minst 6 tecken";
+    }
 }

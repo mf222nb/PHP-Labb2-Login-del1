@@ -129,9 +129,11 @@ class view {
                 //om ingen utloggning efterfrågas så presenteras eventuella meddelande och inloggadskärm.
                 $message = $this->CookieJar->load();
 
+                $username = $this->model->getUsername();
+
                 $viewToReturn = "
                     $message
-                    <p>Du är inloggad!</p>
+                    <h3>$username är inloggad!</h3>
                     <a href='?logout'>Logga ut</a>
                     ";
 

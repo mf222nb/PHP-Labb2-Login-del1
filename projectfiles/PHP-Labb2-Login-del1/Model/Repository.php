@@ -5,7 +5,7 @@
  * Date: 2014-09-26
  * Time: 12:08
  */
-
+//Tog denna från Emils föreläsning https://github.com/dntoll/1dv408-HT14/blob/master/Portfolio/src/model/Repository.php
 abstract class Repository {
     protected $dbUsername = 'root';
     protected $dbPassword = '';
